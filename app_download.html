@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>应用下载</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: #f5f5f5;
+        }
+        .container {
+            text-align: center;
+            max-width: 300px;
+            width: 100%;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            background-color: white;
+        }
+        .app-logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 25px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+        }
+        .tips {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .fallback-message {
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #fff3cd;
+            color: #856404;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="app-logo">📱</div>
+        <div class="tips" id="tips"></div>
+        <div class="fallback-message" id="fallback-message" style="display: none;"></div>
+    </div>
+
+    <script>
+        // 等待DOM加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            // 设备检测函数
+            function detectDevice() {
+                const userAgent = navigator.userAgent.toLowerCase();
+                return {
+                    ios: /iphone|ipad|ipod/.test(userAgent),
+                    android: /android/.test(userAgent) && !/harmonyos/.test(userAgent),
+                    harmony: /harmonyos|harmony/.test(userAgent),
+                    mobile: /iphone|ipad|ipod|android|harmonyos|harmony|blackberry|mini|windows\sce|palm/i.test(userAgent)
+                };
+            }
+
+            // 获取DOM元素
+            const tipsElement = document.getElementById("tips");
+            const fallbackElement = document.getElementById("fallback-message");
+
+            // 应用商店链接（请替换为实际应用的商店链接）
+            const storeUrls = {
+                ios: "https://apps.apple.com/cn/app/your-app-id",
+                android: "https://play.google.com/store/apps/details?id=your.package.name",
+                harmony: "https://appgallery.huawei.com/#/app/C100123456"
+            };
+
+            // 显示提示信息
+            function showMessage(element, message, isError = false) {
+                if (element) {
+                    element.textContent = message;
+                    element.style.display = "block";
+                }
+            }
+
+            // 执行跳转
+            function redirectToStore(url) {
+                showMessage(tipsElement, "正在跳转到应用商店...");
+                // 添加延迟以确保用户看到提示信息
+                setTimeout(() => {
+                    window.location.href = url;
+                }, 1500);
+            }
+
+            // 主逻辑
+            function main() {
+                const device = detectDevice();
+
+                // 非移动设备提示
+                if (!device.mobile) {
+                    showMessage(tipsElement, "请在手机上打开此页面下载应用");
+                    showMessage(fallbackElement, "或者扫描下方二维码下载：");
+                    return;
+                }
+
+                // 根据设备类型跳转
+                if (device.ios) {
+                    showMessage(tipsElement, "检测到iOS设备，即将跳转到App Store...");
+                    redirectToStore(storeUrls.ios);
+                } else if (device.harmony) {
+                    showMessage(tipsElement, "检测到鸿蒙设备，即将跳转到华为应用市场...");
+                    redirectToStore(storeUrls.harmony);
+                } else if (device.android) {
+                    showMessage(tipsElement, "检测到安卓设备，即将跳转到应用商店...");
+                    redirectToStore(storeUrls.android);
+                } else {
+                    showMessage(tipsElement, "暂不支持您的设备类型");
+                    showMessage(fallbackElement, "请联系客服获取下载帮助");
+                }
+            }
+
+            // 启动应用
+            main();
+        });
+    </script>
+</body>
+</html>
